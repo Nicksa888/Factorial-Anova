@@ -93,7 +93,8 @@ GTDDTS <- GTDDT %>% dplyr::filter(specificity == 1)
 
 library(data.table) # for set.names function
 
-setnames(GTDDTS, old = c("iyear", "imonth", "provstate", "city",    "attacktype1_txt", "gname", "targtype1_txt", "weaptype1_txt", "nkill", "nwound"), new = c("Year", "Month", "Province", "City", "Attack", "Group", "Target", "Weapon", "Dead", "Wounded"))
+setnames(GTDDTS, old = c("iyear", "imonth", "provstate", "city",    "attacktype1_txt", "gname", "targtype1_txt", "weaptype1_txt", "nkill", "nwound"), 
+         new = c("Year", "Month", "Province", "City", "Attack", "Group", "Target", "Weapon", "Dead", "Wounded"))
 
 #########################
 # Select Relevant Columns
@@ -109,7 +110,9 @@ dim(GTDDTS)
 # Normality Based Filtering #
 #############################
 
-# The shapiro_test() test for normality, requires a sample size to be between 3 and 5000. There is the ad.test() to use with a different sample size. However, this only is suitable for one variable. Therefore, to reduce the sample size so it is between these parameters (3-5000 rows), ISIS as the highest named group, is chosen as the sample. The FG attack count is indicated in the table below
+# The shapiro_test() test for normality, requires a sample size to be between 3 and 5000. There is the ad.test() to use with a different sample size. 
+However, this only is suitable for one variable. Therefore, to reduce the sample size so it is between these parameters (3-5000 rows), ISIS as the 
+highest named group, is chosen as the sample. The FG attack count is indicated in the table below
 
 Groups <- GTDDTS %>%
   count(Group, sort = T)
@@ -188,7 +191,8 @@ Attacks <- as.data.frame(Attacks) # convert Groups object into data frame
 Attacks <- rename(Attacks, Count = n) # rename n column as Count
 Attacks
 
-# Hostage Taking (Barricade Incident), with 17, Facility/Infrastructure Attack with 7 and Hijacking with 3, have very low counts, so have been collectively grouped as Other Attack. Unknown Attack has also been grouped with Other Attack. 
+# Hostage Taking (Barricade Incident), with 17, Facility/Infrastructure Attack with 7 and Hijacking with 3, have very low counts, so have been 
+collectively grouped as Other Attack. Unknown Attack has also been grouped with Other Attack. 
 # Create new variable Attack_type using mutate() and case_when()
 
 ISIS <- ISIS %>%
@@ -313,21 +317,25 @@ plotmeans(formula = Dead ~ Attack_Type, # Count by Attack Type
 # What is ANOVA #
 #################
 
-# ANOVA is a statistical test for estimating how a quantitative dependent variable changes according to the levels of one or more categorical independent variables. ANOVA tests whether there is a difference in means of the groups at each level of the independent variable.
+# ANOVA is a statistical test for estimating how a quantitative dependent variable changes according to the levels of one or more categorical independent 
+variables. ANOVA tests whether there is a difference in means of the groups at each level of the independent variable.
 
 # Anova Assumptions
 # The ANOVA test makes the following assumptions about the data:
 
-# Independence of the observations. Each subject should belong to only one group. There is no relationship between the observations in each group. Having repeated measures for the same participants is not allowed.
+# Independence of the observations. Each subject should belong to only one group. There is no relationship between the observations in each group. 
+Having repeated measures for the same participants is not allowed.
 # No significant outliers in any cell of the design
 # Normality. the data for each design cell should be approximately normally distributed.
 # Homogeneity of variances. The variance of the outcome variable should be equal in every cell of the design.
 
 # Note that, if the above assumptions are not met there is a non-parametric alternative (Kruskal-Wallis test) to the one-way ANOVA.
 
-# Unfortunately, there are no non-parametric alternatives to the two-way and the three-way ANOVA. Thus, in the situation where the assumptions are not met, you could consider running the two-way/three-way ANOVA on the transformed and non-transformed data to see if there are any meaningful differences.
+# Unfortunately, there are no non-parametric alternatives to the two-way and the three-way ANOVA. Thus, in the situation where the assumptions are not 
+met, you could consider running the two-way/three-way ANOVA on the transformed and non-transformed data to see if there are any meaningful differences.
 
-# If both tests lead you to the same conclusions, you might not choose to transform the outcome variable and carry on with the two-way/three-way ANOVA on the original data.
+# If both tests lead you to the same conclusions, you might not choose to transform the outcome variable and carry on with the two-way/three-way ANOVA 
+on the original data.
 
 # It's also possible to perform robust ANOVA test using the WRS2 R package.
 
@@ -361,7 +369,9 @@ durbinWatsonTest(model)
 # 0 to <2 is positive autocorrelation.
 # > 2 to 4 is negative autocorrelation.
 
-# From the output we can see that the test statistic is 1.973246 and the corresponding p-value is 0.204. The test statistic is between 0 and 2, which means there is positive autocorrelation. But, it is very close to two, so is very slight Since this p-value is bigger than 0.05, we can uphold the null hypothesis and conclude that the residuals in this regression model are not autocorrelated and therefore are independent.
+# From the output we can see that the test statistic is 1.973246 and the corresponding p-value is 0.204. The test statistic is between 0 and 2, which 
+means there is positive autocorrelation. But, it is very close to two, so is very slight Since this p-value is bigger than 0.05, we can uphold the null 
+hypothesis and conclude that the residuals in this regression model are not autocorrelated and therefore are independent.
 
 # Now 
 
@@ -390,7 +400,8 @@ ISIS %>%
   group_by(Attack_Type) %>%
   identify_outliers(Dead)
 
-# There are some extreme outliers, so this assumption has been violated. It's possible to keep the outliers in the data and perform a robust ANOVA test using the WRS2 package using the t1way() function, as follows:
+# There are some extreme outliers, so this assumption has been violated. It's possible to keep the outliers in the data and perform a robust ANOVA test 
+using the WRS2 package using the t1way() function, as follows:
 
 t1way(Dead ~ Attack_Type, ISIS)
 
@@ -402,10 +413,12 @@ t1way(Dead ~ Attack_Type, ISIS)
 
 # The normality assumption can be checked by using one of the following two approaches:
 
-# Analyzing the ANOVA model residuals to check the normality for all groups together. This approach is easier and it's very handy when you have many groups or if there are few data points per group.
+# Analyzing the ANOVA model residuals to check the normality for all groups together. This approach is easier and it's very handy when you have many 
+groups or if there are few data points per group.
 # Check normality for each group separately. This approach might be used when you have only a few groups and many data points per group.
 
-# Check normality assumption by analyzing the model residuals. QQ plot and Shapiro-Wilk test of normality are used. QQ plot draws the correlation between a given data and the normal distribution.
+# Check normality assumption by analyzing the model residuals. QQ plot and Shapiro-Wilk test of normality are used. QQ plot draws the correlation between 
+a given data and the normal distribution.
 
 # Build the linear model
 model  <- lm(Dead ~ Attack_Type, ISIS)
@@ -414,14 +427,17 @@ model  <- lm(Dead ~ Attack_Type, ISIS)
 
 ggqqplot(residuals(model))
 
-# The sample residuals follow a normal theoretical distribution for much of the sample data distribution, but it appears to diverge from the theoretical line towards the end of the data set.
+# The sample residuals follow a normal theoretical distribution for much of the sample data distribution, but it appears to diverge from the theoretical 
+line towards the end of the data set.
 
 # Compute Shapiro-Wilk test of normality
 shapiro_test(residuals(model))
 
 # It is significant, with a p-value of  2.04e-81, so the assumption of normality has been violated
 
-# Check normality assumption by groups. Computing Shapiro-Wilk test for each Attack variable level. If the data is normally distributed, the p-value should be greater than 0.05. The output below indicates that hostage kidnap and other attack have particularly significant distributions that dont follow normal distribution
+# Check normality assumption by groups. Computing Shapiro-Wilk test for each Attack variable level. If the data is normally distributed, the p-value 
+should be greater than 0.05. The output below indicates that hostage kidnap and other attack have particularly significant distributions that dont 
+follow normal distribution
 
 ISIS %>% 
   group_by(Attack_Type) %>%
@@ -453,7 +469,8 @@ sf.test(ISIS$Dead) # Error in sf.test(ISIS$Dead) : sample size must be between 5
 
 ggqqplot(ISIS, "Dead", facet.by = "Attack_Type")
 
-# Therefore, with normality assumption violated, it is advised to use the kruskal test, which is the non-parametric alternative to one-way ANOVA test, as follows:
+# Therefore, with normality assumption violated, it is advised to use the kruskal test, which is the non-parametric alternative to one-way ANOVA test, 
+as follows:
 
 kruskal.test(Dead ~ Attack_Type, ISIS)
 
@@ -472,22 +489,27 @@ plot(model)
 TR <- ISIS %>% levene_test(Dead ~ Attack_Type)
 levene_test(ISIS, Dead ~ Attack_Type)
 ?levene_test
-# From the output above, we can see that the p-value is 1.11e-21, which is significant. This means that, there is significant difference between variances across attack types. Therefore, we cant assume the homogeneity of variances in the different attack types.
+# From the output above, we can see that the p-value is 1.11e-21, which is significant. This means that, there is significant difference between variances
+across attack types. Therefore, we cant assume the homogeneity of variances in the different attack types.
 
 ### Bartlett test for homogeneity of variance ###
 
 bartlett.test(Dead ~ Attack_Type, ISIS) 
 
-# From the output above, we can see that the p-value is 2.2e-16, which is significant. This means that, there is significant difference between variances across attack types. Therefore, we cant assume the homogeneity of variances in the different attack types.
+# From the output above, we can see that the p-value is 2.2e-16, which is significant. This means that, there is significant difference between variances 
+across attack types. Therefore, we cant assume the homogeneity of variances in the different attack types.
 
-# In a situation where the homogeneity of variance assumption is not met, it is possible to compute the Welch one-way ANOVA test using the function welch_anova_test() from the rstatix package. This test does not require the assumption of equal variances.
+# In a situation where the homogeneity of variance assumption is not met, it is possible to compute the Welch one-way ANOVA test using the function 
+welch_anova_test() from the rstatix package. This test does not require the assumption of equal variances.
 
 #############################################################
 # What to do when homogeneity of variance has been violated #
 #############################################################
 
-# The Welch one-way test is an alternative to the standard one-way ANOVA in the situation where the homogeneity of variance can't be assumed (i.e., Levene test is significant).
-# In this case, the Games-Howell post hoc test or pairwise t-tests (with no assumption of equal variances) can be used to compare all possible combinations of group differences.
+# The Welch one-way test is an alternative to the standard one-way ANOVA in the situation where the homogeneity of variance can't be assumed (i.e., Levene 
+test is significant).
+# In this case, the Games-Howell post hoc test or pairwise t-tests (with no assumption of equal variances) can be used to compare all possible combinations
+of group differences.
 
 # Welch One way ANOVA test
 res.aov2 <- ISIS %>% welch_anova_test(Dead ~ Attack_Type)
@@ -532,10 +554,13 @@ ggboxplot(ISIS,
 res.aov <- ISIS %>% anova_test(Dead ~ Attack_Type)
 res.aov
 
-# In the table above, the column ges corresponds to the generalized eta squared (effect size). It measures the proportion of the variability in the outcome variable (here Dead count) that can be explained in terms of the predictor (here, attack type). An effect size of 0.04 (4%) means that 4% of the change in the dead count can be accounted for the attack type.
+# In the table above, the column ges corresponds to the generalized eta squared (effect size). It measures the proportion of the variability in the outcome 
+variable (here Dead count) that can be explained in terms of the predictor (here, attack type). An effect size of 0.04 (4%) means that 4% of the change 
+in the dead count can be accounted for the attack type.
 
-# From the above ANOVA table, it can be seen that there are significant differences between attack types (p = 6.24e-23), which are highlighted with "*", F(4, 2677) = 28.144, p = 6.24e-23, eta2[g] = 0.0, where
-# F indicates that we are comparing to an F-distribution (F-test); (2, 27) indicates the degrees of freedom in the numerator (DFn) and the denominator (DFd), respectively; 4.85 indicates the obtained F-statistic value
+# From the above ANOVA table, it can be seen that there are significant differences between attack types (p = 6.24e-23), which are highlighted with "*", 
+ F(4, 2677) = 28.144, p = 6.24e-23, eta2[g] = 0.0, where F indicates that we are comparing to an F-distribution (F-test); (2, 27) indicates the degrees
+of freedom in the numerator (DFn) and the denominator (DFd), respectively; 4.85 indicates the obtained F-statistic value
 # p specifies the p-value
 # ges is the generalized effect size (amount of variability due to the factor)
 
@@ -545,7 +570,9 @@ res.aov
 ################
 ################
 
-# A significant one-way ANOVA is generally followed up by Tukey post-hoc tests to perform multiple pairwise comparisons between groups. This tells us that the mean value between each group is not equal. However, it doesn't tell us which groups differ from each other. To determine this, it is neccesary to use Tukey HSD statistical test.
+# A significant one-way ANOVA is generally followed up by Tukey post-hoc tests to perform multiple pairwise comparisons between groups. This tells us that 
+  the mean value between each group is not equal. However, it doesn't tell us which groups differ from each other. To determine this, it is neccesary to
+  use Tukey HSD statistical test.
 
 # Pairwise comparisons
 pwc <- ISIS %>% tukey_hsd(Dead ~ Attack_Type)
@@ -578,8 +605,9 @@ ggboxplot(ISIS, x = "Attack", y = "Dead") +
 
 # using the asbio package for Post Hoc pairwise comparisons
 
-# First, the so-called Fisher's Protected LSD test is obtained. Recall that when there are three groups or categorical levels, simulation work has shown that performing the LSD
-# tests following a significant omnibus F test does afford protection from error rate inflation. But when the design has more than three groups, the LSD test# CANNOT be recommended.
+# First, the so-called Fisher's Protected LSD test is obtained. Recall that when there are three groups or categorical levels, simulation work has shown 
+  that performing the LSD tests following a significant omnibus F test does afford protection from error rate inflation. But when the design has more than 
+  three groups, the LSD test# CANNOT be recommended.
 
 # #require(asbio)
 lsdCI(ISIS$Dead, ISIS$Attack)
@@ -645,7 +673,8 @@ t1waybt(Dead ~ Attack_Type,
 
 # It is significant
 
-# It is possible to employ another WRS2 function, mcppb20, to do pairwise post hoc tests comparing pairs of groups within the bootstrapping and trimming framework
+# It is possible to employ another WRS2 function, mcppb20, to do pairwise post hoc tests comparing pairs of groups within the bootstrapping and trimming 
+framework
 
 mcppb20(Dead ~ Attack_Type,
         tr = .2,
@@ -673,7 +702,9 @@ my.anova
 summary(my.anova)
 contrasts(ISIS$Attack) # indicates which Attack variable level is used as the intercept reference, which in this case, it is armed assault
 
-#  R doesn't use the names "between-group" and "within-group". Instead, it tries to assign more meaningful names: in our particular example, the between groups variance corresponds to the effect that the drug has on the outcome variable; and the within groups variance is corresponds to the "leftover" variability, so it calls that the residuals
+#  R doesn't use the names "between-group" and "within-group". Instead, it tries to assign more meaningful names: in our particular example, the between 
+  groups variance corresponds to the effect that the drug has on the outcome variable; and the within groups variance is corresponds to the "leftover" 
+  variability, so it calls that the residuals
 
 summary(my.anova)
 
@@ -685,7 +716,9 @@ summary.lm(my.anova)
 
 # The intercept is the baseline or control group - armed assault in this instance. 
 # The intercept estimate is the mean for armed assault
-# The remainder of the values in the estimate column are the difference in means between the baseline armed assault and each individual attack type. So, for instance, the mean of assassination attack deaths is 3.2365 lower than armed assault mean dead, as indicated by the minus symbol. All other means are higher than armed assault, as they are all positive.
+# The remainder of the values in the estimate column are the difference in means between the baseline armed assault and each individual attack type. 
+  So, for instance, the mean of assassination attack deaths is 3.2365 lower than armed assault mean dead, as indicated by the minus symbol. All other means 
+  are higher than armed assault, as they are all positive.
 # The error is the differences in standard error between each pair of means
 # Unarmed Assault is the only non significant difference in mean with armed assault. All others are significant
 # The F-statistic is 169.3 on 4 and 50642 DF,  p-value: < 2.2e-16, which is a lot higher than it would be if it was by chance.
@@ -698,7 +731,8 @@ summary.aov(my.anova)
 Tukey <- TukeyHSD(my.anova) # HSD is Honestly Significant Difference
 plot(Tukey)
 
-# The p adj column indicates whether each pair of mean difference is significant or not in terms of dead values. In other words, this column informs which pairs of mean differences are driving the fact that the Attack variable has significant differences in mean with dead values.
+# The p adj column indicates whether each pair of mean difference is significant or not in terms of dead values. In other words, this column informs which 
+pairs of mean differences are driving the fact that the Attack variable has significant differences in mean with dead values.
 
 # Homogeneity of variance #
 
